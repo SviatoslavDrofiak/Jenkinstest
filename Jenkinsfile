@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        DEBIAN_FRONTEND = 'noninteractive'
+    }
+
     stages {
         stage('Install Apache') {
             steps {
@@ -10,6 +14,7 @@ pipeline {
                     sudo apt-get install -y apache2
                     sudo systemctl enable apache2
                     sudo systemctl start apache2
+                    sudo systemctl status apache2 || echo "Apache2 failed to start!"
                 '''
             }
         }
@@ -25,7 +30,7 @@ pipeline {
                         echo "Checking for 5xx errors..."
                         grep ' 5[0-9][0-9] ' $LOG_FILE || echo "No 5xx errors"
                     else
-                        echo "Log file not found!"
+                        echo "Apache log file not found. Is Apache running and serving requests?"
                     fi
                 '''
             }
